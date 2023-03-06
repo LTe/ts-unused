@@ -1,6 +1,6 @@
 type User = {
   username: string
-  email: string
+  email: string;
 }
 
 const user: User = {
