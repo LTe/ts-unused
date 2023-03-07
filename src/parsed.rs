@@ -5,37 +5,35 @@ use swc_common::{SourceFile, SourceMap};
 use swc_ecma_ast::Module;
 use swc_ecma_parser::{lexer::Lexer, Parser, StringInput, Syntax};
 
-#[derive(Debug)]
-pub struct UnusedParser {
-    pub module: Module,
+pub struct SWCParser<'a> {
+    parser: Parser<Lexer<'a>>
 }
 
-impl UnusedParser {
-    pub fn new(path: &str) -> UnusedParser {
-        let module = parse(path);
+impl<'a> SWCParser<'a> {
+    pub fn new(path: &'a str) -> Result<SWCParser<'a>, Box<dyn Error>> {
+        let source_file = source_file(path)?;
+        let parser = parser(source_file);
 
-        UnusedParser {
-            module: module.unwrap(),
-        }
+        Ok(Self { parser })
+    }
+
+    pub fn parse(&mut self) -> Module {
+        let module = self.parser
+            .parse_typescript_module()
+            .expect("Failed to parse module.");
+
+        module
     }
 }
 
-fn parse(path: &str) -> Result<Module, Box<dyn Error>> {
-    let source_file = source_file(path)?;
-    let string_input = StringInput::from(&*source_file);
-    let parser = parser(string_input)?;
-
-    Ok(parser)
-}
-
-fn source_file(path: &str) -> Result<Rc<SourceFile>, Box<dyn Error>> {
+fn source_file(path: &str) -> Result<StringInput, Box<dyn Error>> {
     let source_map: SourceMap = Default::default();
     let source_file = source_map.load_file(Path::new(path))?;
 
-    Ok(source_file)
+    Ok(StringInput::from(&*Rc::clone(&source_file)))
 }
 
-fn parser(source_file: StringInput) -> Result<swc_ecma_ast::Module, Box<dyn Error>> {
+fn parser(source_file: StringInput) -> swc_ecma_parser::Parser<Lexer> {
     let lexer = Lexer::new(
         Syntax::Typescript(Default::default()),
         Default::default(),
@@ -43,10 +41,5 @@ fn parser(source_file: StringInput) -> Result<swc_ecma_ast::Module, Box<dyn Erro
         None,
     );
 
-    let mut parser = Parser::new_from(lexer);
-    let module = parser
-        .parse_typescript_module()
-        .expect("Failed to parse module.");
-
-    Ok(module)
+    Parser::new_from(lexer)
 }
