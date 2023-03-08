@@ -5,8 +5,8 @@ mod parsed;
 fn main() -> Result<(), Box<dyn Error>> {
     let path = "./src/data/test.ts";
     let parser = SWCParser::new(path)?;
-    
-    dbg!(parser.parse());
+
+    dbg!(parser.module);
 
     Ok(())
 }
