@@ -27,9 +27,8 @@ impl TypescriptType {
 impl From<&TsTypeLit> for TypescriptType {
     fn from(item: &TsTypeLit) -> Self {
         let members = &item.members;
-        let typescript_type = TypescriptType::new();
 
-        let names: Vec<String> = members
+        let names: Vec<Property> = members
             .iter()
             .map(|member| {
                 let atom = match member {
@@ -46,25 +45,35 @@ impl From<&TsTypeLit> for TypescriptType {
                     }
                 };
 
-                atom.to_string()
+                Property {
+                    name: atom.to_string(),
+                    kind: String::from("string"),
+                }
             })
             .collect();
 
-        dbg!(names);
-
-        typescript_type
+        TypescriptType { fields: names }
     }
 }
 
-pub struct Visitor;
+#[derive(Debug)]
+pub struct Visitor {
+    typescript_types: Vec<TypescriptType>,
+}
+
+impl Visitor {
+    pub fn new() -> Self {
+        Visitor { typescript_types: vec![] }
+    }
+}
 
 impl Visit for Visitor {
     fn visit_ts_type(&mut self, ts_type: &TsType) {
-        match ts_type {
+        let resolved_type = match ts_type {
             TsType::TsTypeLit(literal) => TypescriptType::from(literal),
             _ => TypescriptType::new(),
         };
 
-        ()
+        self.typescript_types.push(resolved_type)
     }
 }

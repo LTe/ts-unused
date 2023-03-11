@@ -11,13 +11,11 @@ fn main() -> Result<(), Box<dyn Error>> {
     let parser = SWCParser::new(path)?;
     let module = parser.module;
 
-    let typescript_type = TypescriptType::new();
-
-    let mut visitor = types::Visitor {};
+    let mut visitor = types::Visitor::new();
 
     visitor.visit_module(&module);
 
-    dbg!(typescript_type);
+    dbg!(visitor);
 
     Ok(())
 }
