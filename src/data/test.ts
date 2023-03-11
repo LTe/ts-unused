@@ -1,12 +1,11 @@
 type User = {
   username: string,
-  email: string;
+  age: number;
 }
 
 const user: User = {
-  username: 'John',
-  email: 'john.doe@example.com'
+  username: 'john',
+  age: 21
 }
 
 console.debug(user.username)
-

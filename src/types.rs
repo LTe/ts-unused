@@ -1,58 +1,57 @@
-use std::convert::From;
-use swc_common::{util::move_map::MoveMap, TypeEq};
 use swc_ecma_ast::*;
 use swc_ecma_visit::*;
 
 #[derive(Default, Debug)]
 pub struct TypescriptType {
+    name: String,
     fields: Vec<Property>,
 }
 
 #[derive(Debug)]
 struct Property {
-    kind: String,
     name: String,
 }
 
-impl TypescriptType {
-    pub fn new() -> TypescriptType {
-        TypescriptType { fields: vec![] }
-    }
+impl TryFrom<&TsTypeAliasDecl> for TypescriptType {
+    type Error = &'static str;
 
-    pub fn add(&mut self, property: Property) {
-        self.fields.push(property)
-    }
-}
+    fn try_from(item: &TsTypeAliasDecl) -> Result<Self, Self::Error> {
+        let name = item.id.sym.to_string();
 
-impl From<&TsTypeLit> for TypescriptType {
-    fn from(item: &TsTypeLit) -> Self {
-        let members = &item.members;
+        match *item.type_ann.clone() {
+            TsType::TsTypeLit(literal) => {
+                let members = &literal.members;
 
-        let names: Vec<Property> = members
-            .iter()
-            .map(|member| {
-                let atom = match member {
-                    TsTypeElement::TsPropertySignature(TsPropertySignature { key, .. }) => {
-                        match *key.clone() {
-                            Expr::Ident(Ident { sym, .. }) => sym,
+                let names: Vec<Property> = members
+                    .iter()
+                    .map(|member| {
+                        let resolved_type = match member {
+                            TsTypeElement::TsPropertySignature(TsPropertySignature {
+                                key, ..
+                            }) => match *key.clone() {
+                                Expr::Ident(Ident { sym, .. }) => sym,
+                                _ => {
+                                    panic!()
+                                }
+                            },
                             _ => {
                                 panic!()
                             }
+                        };
+
+                        Property {
+                            name: resolved_type.to_string(),
                         }
-                    }
-                    _ => {
-                        panic!()
-                    }
-                };
+                    })
+                    .collect();
 
-                Property {
-                    name: atom.to_string(),
-                    kind: String::from("string"),
-                }
-            })
-            .collect();
-
-        TypescriptType { fields: names }
+                Ok(TypescriptType {
+                    name,
+                    fields: names,
+                })
+            }
+            _ => Err("Unsupported type"),
+        }
     }
 }
 
@@ -63,17 +62,17 @@ pub struct Visitor {
 
 impl Visitor {
     pub fn new() -> Self {
-        Visitor { typescript_types: vec![] }
+        Visitor {
+            typescript_types: vec![],
+        }
     }
 }
 
 impl Visit for Visitor {
-    fn visit_ts_type(&mut self, ts_type: &TsType) {
-        let resolved_type = match ts_type {
-            TsType::TsTypeLit(literal) => TypescriptType::from(literal),
-            _ => TypescriptType::new(),
-        };
-
-        self.typescript_types.push(resolved_type)
+    fn visit_ts_type_alias_decl(&mut self, type_alias: &TsTypeAliasDecl) {
+        match TypescriptType::try_from(type_alias) {
+            Ok(typescript_type) => self.typescript_types.push(typescript_type),
+            Err(_) => { () }
+        }
     }
 }
