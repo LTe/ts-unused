@@ -6,7 +6,7 @@ use std::error::Error;
 use swc_ecma_visit::Visit;
 
 fn main() -> Result<(), Box<dyn Error>> {
-    let path = "./src/data/test.ts";
+    let path = "./tests/data/test.ts";
     let parser = SWCParser::new(path)?;
     let module = parser.module;
 

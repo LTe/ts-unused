@@ -39,3 +39,22 @@ fn parser(source_file: StringInput) -> swc_ecma_parser::Parser<Lexer> {
 
     Parser::new_from(lexer)
 }
+
+#[cfg(test)]
+mod test {
+    use super::SWCParser;
+
+    #[test]
+    fn it_creates_parsed_modules() {
+        let parser = SWCParser::new("./tests/data/test.ts");
+
+        assert!(parser.is_ok())
+    }
+
+    #[test]
+    fn it_does_now_create_parsed_module_for_non_existing_file() {
+        let parser = SWCParser::new("./tests/data/__DO_NOT_EXISTS__.ts");
+
+        assert!(parser.is_err())
+    }
+}
