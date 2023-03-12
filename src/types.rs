@@ -1,15 +1,15 @@
 use swc_ecma_ast::*;
-use swc_ecma_visit::*;
+use swc_ecma_visit::Visit;
 
-#[derive(Default, Debug)]
+#[derive(Default, Debug, Eq, PartialEq)]
 pub struct TypescriptType {
-    name: String,
-    fields: Vec<Property>,
+    pub name: String,
+    pub fields: Vec<Property>,
 }
 
-#[derive(Debug)]
-struct Property {
-    name: String,
+#[derive(Debug, Eq, PartialEq)]
+pub struct Property {
+    pub name: String,
 }
 
 impl TryFrom<&TsTypeAliasDecl> for TypescriptType {
@@ -57,7 +57,7 @@ impl TryFrom<&TsTypeAliasDecl> for TypescriptType {
 
 #[derive(Debug)]
 pub struct Visitor {
-    typescript_types: Vec<TypescriptType>,
+    pub typescript_types: Vec<TypescriptType>,
 }
 
 impl Visitor {
@@ -72,7 +72,7 @@ impl Visit for Visitor {
     fn visit_ts_type_alias_decl(&mut self, type_alias: &TsTypeAliasDecl) {
         match TypescriptType::try_from(type_alias) {
             Ok(typescript_type) => self.typescript_types.push(typescript_type),
-            Err(_) => { () }
+            Err(_) => (),
         }
     }
 }
