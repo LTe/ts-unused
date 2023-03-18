@@ -1,18 +1,13 @@
-use swc_ecma_visit::Visit;
-use ts_unused::parser::SWCParser;
-use ts_unused::visitor::{Property, TypescriptType, Visitor};
+use ts_unused::checker::Checker;
+use ts_unused::visitor::{Property, TypescriptType};
 
 #[test]
 fn test_single_file() {
   let path = "./tests/data/test.ts";
-  let parser = SWCParser::new(path).unwrap();
-
-  let mut visitor = Visitor::new();
-
-  visitor.visit_module(&parser.module);
+  let checker = Checker::check(path);
 
   assert_eq!(
-    visitor.typescript_types(),
+    checker.typescript_types(),
     vec![TypescriptType::new(
       String::from("User"),
       vec![
