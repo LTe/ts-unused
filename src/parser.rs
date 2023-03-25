@@ -1,6 +1,5 @@
-use std::error::Error;
 use std::path::Path;
-use std::rc::Rc;
+use std::{error::Error, sync::Arc};
 use swc_common::{SourceFile, SourceMap};
 use swc_ecma_ast::Module;
 use swc_ecma_parser::{lexer::Lexer, Parser, StringInput, Syntax};
@@ -22,7 +21,7 @@ impl SWCParser {
   }
 }
 
-fn source_file(path: &str) -> Result<Rc<SourceFile>, Box<dyn Error>> {
+fn source_file(path: &str) -> Result<Arc<SourceFile>, Box<dyn Error>> {
   let source_map: SourceMap = Default::default();
   let source_file = source_map.load_file(Path::new(path))?;
 

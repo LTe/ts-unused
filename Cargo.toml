@@ -6,7 +6,12 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-swc_common = { version = "0.29.33" }
-swc_ecma_ast = "0.98.0"
-swc_ecma_parser = "0.128.1"
-swc_ecma_visit = "0.84.2"
+stc_ts_type_checker = { git = "https://github.com/dudykr/stc.git" }
+stc_ts_env = { git = "https://github.com/dudykr/stc.git" }
+stc_ts_file_analyzer = { git = "https://github.com/dudykr/stc.git" }
+stc_ts_module_loader = { git = "https://github.com/dudykr/stc.git" }
+stc_ts_builtin_types = { git = "https://github.com/dudykr/stc.git" }
+swc_common = { version = "0.29.31", features = ["tty-emitter"] }
+swc_ecma_ast = "*"
+swc_ecma_parser = "*"
+swc_ecma_visit = "*"

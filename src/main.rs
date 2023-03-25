@@ -1,18 +1,12 @@
 use std::error::Error;
-use swc_ecma_visit::Visit;
-use ts_unused::parser::SWCParser;
-use ts_unused::visitor::Visitor;
+use ts_unused::checker::UnusedChecker;
 
 fn main() -> Result<(), Box<dyn Error>> {
   let path = "./tests/data/test.ts";
-  let parser = SWCParser::new(path)?;
-  let module = parser.module;
+  let unused_checker = UnusedChecker::check(path);
+  let checker = unused_checker.create_stc_checker(path);
 
-  let mut visitor = Visitor::new();
-
-  visitor.visit_module(&module);
-
-  dbg!(visitor);
+  dbg!(unused_checker);
 
   Ok(())
 }
