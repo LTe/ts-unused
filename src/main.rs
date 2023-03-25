@@ -1,12 +1,17 @@
-use std::error::Error;
+use stc_ts_type_checker::loader::LoadModule;
+use stc_ts_types::Type;
+use std::{error::Error, path::PathBuf, sync::Arc};
+use swc_common::FileName;
+use swc_ecma_ast::Lit;
 use ts_unused::checker::UnusedChecker;
 
 fn main() -> Result<(), Box<dyn Error>> {
-  let path = "./tests/data/test.ts";
-  let unused_checker = UnusedChecker::check(path);
-  let checker = unused_checker.create_stc_checker(path);
+  swc_common::GLOBALS.set(&swc_common::Globals::new(), || {
+    let path = "./tests/data/test.ts";
+    let unused_checker = UnusedChecker::check(path);
 
-  dbg!(unused_checker);
+    dbg!(unused_checker);
+  });
 
   Ok(())
 }

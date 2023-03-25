@@ -1,5 +1,5 @@
 use ts_unused::{
-  checker::UnusedChecker,
+  checker::{NewUnusedChecker, UnusedChecker},
   visitor::{Property, TypescriptType},
 };
 
@@ -18,4 +18,12 @@ fn test_single_file() {
       ]
     )]
   );
+}
+
+#[test]
+fn test_single_file_new() {
+  let path = "./tests/data/test.ts";
+  let checker = NewUnusedChecker::check(path);
+
+  assert_eq!(checker.typescript_types().first().unwrap().as_str(), "User");
 }

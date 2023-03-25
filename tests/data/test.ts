@@ -3,9 +3,9 @@ type User = {
   age: number;
 }
 
-const user: User = {
+const john: User = {
   username: 'john',
   age: 21
 }
 
-console.debug(user.username)
+console.debug(john.username);
