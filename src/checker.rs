@@ -22,45 +22,16 @@ pub struct UnusedChecker {
 
 impl UnusedChecker {
   pub fn check(path: &str) -> Self {
-    // let parser = SWCParser::new(path).unwrap();
+    let parser = SWCParser::new(path).unwrap();
 
     let mut visitor = Visitor::new();
-    // visitor.visit_module(&parser.module);
+    visitor.visit_module(&parser.module);
 
     UnusedChecker { visitor }
   }
 
   pub fn typescript_types(self) -> Vec<TypescriptType> {
     self.visitor.typescript_types()
-  }
-
-  fn get_env() -> Env {
-    let mut libs = vec![];
-    let ls = &[
-      "es2022.full",
-      "es2021.full",
-      "es2020.full",
-      "es2019.full",
-      "es2018.full",
-      "es2017.full",
-      "es2016.full",
-      "es2015.full",
-    ];
-    for s in ls {
-      libs.extend(Lib::load(s))
-    }
-    libs.sort();
-    libs.dedup();
-
-    Env::simple(
-      Rule {
-        strict_function_types: true,
-        ..Default::default()
-      },
-      EsVersion::latest(),
-      ModuleConfig::None,
-      &libs,
-    )
   }
 
   pub fn create_stc_checker(
