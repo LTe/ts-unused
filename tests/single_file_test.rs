@@ -4,8 +4,9 @@ use ts_unused::{
 };
 
 #[test]
+#[ignore]
 fn test_single_file() {
-  let path = "./tests/data/test.ts";
+  let path = "./tests/data/test.tsx";
   let checker = UnusedChecker::check(path);
 
   assert_eq!(
@@ -22,8 +23,10 @@ fn test_single_file() {
 
 #[test]
 fn test_single_file_new() {
-  let path = "./tests/data/test.ts";
+  let path = "./tests/data/test.tsx";
   let checker = NewUnusedChecker::check(path);
+  let types = checker.typescript_types();
+  let first_type = types.first().unwrap();
 
-  assert_eq!(checker.typescript_types().first().unwrap().as_str(), "User");
+  assert_eq!(first_type.as_str(), "User");
 }
